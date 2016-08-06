@@ -27,9 +27,9 @@ SerialFlaschenTaschen::SerialFlaschenTaschen(int fd, int width, int height)
   buffer_[0] = 1;
   for (int i = 0; i < width_ * height_; i+= 1) {
     int off = 1 + (i * 3);
-    buffer_[off] = 255; // r
-    buffer_[off + 1] = 255; // g
-    buffer_[off + 2] = 255; // b
+    buffer_[off] = 0; // r
+    buffer_[off + 1] = 0; // g
+    buffer_[off + 2] = 0; // b
   }
 }
 
@@ -52,9 +52,9 @@ void SerialFlaschenTaschen::SetPixel(int x, int y, const Color &col) {
     // horizontal mirror so that bottom left is 0,0
     y = height_ - (y + 1);
     int pos = 1 + ((y * width_ + x) * 3); // * 3 for rgb
-    //buffer_[pos] = ensure_not_one(col.r);
-    //buffer_[pos + 1] = ensure_not_one(col.g);
-    //buffer_[pos + 2] = ensure_not_one(col.b);
+    buffer_[pos] = ensure_not_one(col.r);
+    buffer_[pos + 1] = ensure_not_one(col.g);
+    buffer_[pos + 2] = ensure_not_one(col.b);
 }
 
 void SerialFlaschenTaschen::Send() {
