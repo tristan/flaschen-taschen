@@ -152,4 +152,30 @@ private:
     size_t lower_row_pixel_offset_;
 };
 
+// B&B
+
+class SerialFlaschenTaschen : public ServerFlaschenTaschen {
+public:
+    SerialFlaschenTaschen(int serial_fd, int width, int heigh);
+    virtual ~SerialFlaschenTaschen();
+    virtual void PostDaemonInit();
+
+    int width() const { return width_; }
+    int height() const { return height_; }
+
+    void SetPixel(int x, int y, const Color &col);
+    void Send();
+
+private:
+    const int serial_fd_;
+    const int width_;
+    const int height_;
+    bool is_first_;
+    int64_t last_time_usec_;
+
+    uint8_t *buffer_;
+    size_t size_;
+
+};
+
 #endif // LED_FLASCHEN_TASCHEN_H_

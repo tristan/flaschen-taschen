@@ -24,6 +24,10 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#if FT_BACKEND == 3
+#include <sys/stat.h>
+#include <fcntl.h>
+#endif
 #include <unistd.h>
 
 #include <string>
@@ -176,6 +180,14 @@ int main(int argc, char *argv[]) {
         hd_terminal
         ? new HDTerminalFlaschenTaschen(STDOUT_FILENO, width, height)
         : new TerminalFlaschenTaschen(STDOUT_FILENO, width, height);
+#elif FT_BACKEND == 3
+    int serialfd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY | O_SYNC);
+    if (serialfd == -1) {
+        fprintf(stderr, "ERROR: %s\n", strerror(errno));
+        return 1;
+    }
+    ServerFlaschenTaschen *display =
+        new SerialFlaschenTaschen(serialfd, width, height);
 #endif
 
     // Start all the services and report problems (such as sockets already
