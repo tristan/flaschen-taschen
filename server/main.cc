@@ -183,8 +183,11 @@ int main(int argc, char *argv[]) {
 #elif FT_BACKEND == 3
     int serialfd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY | O_SYNC);
     if (serialfd == -1) {
-        fprintf(stderr, "ERROR: %s\n", strerror(errno));
-        return 1;
+        serialfd = open("/dev/ttyACM1", O_RDWR | O_NOCTTY | O_SYNC);
+        if (serialfd == -1) {
+            fprintf(stderr, "ERROR: %s\n", strerror(errno));
+            return 1;
+        }
     }
     ServerFlaschenTaschen *display =
         new SerialFlaschenTaschen(serialfd, width, height);
