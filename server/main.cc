@@ -181,14 +181,25 @@ int main(int argc, char *argv[]) {
         ? new HDTerminalFlaschenTaschen(STDOUT_FILENO, width, height)
         : new TerminalFlaschenTaschen(STDOUT_FILENO, width, height);
 #elif FT_BACKEND == 3
-    int serialfd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY | O_SYNC);
+    int serialfd = open("/dev/ttyACM0", O_WRONLY | O_NOCTTY);
     if (serialfd == -1) {
-        serialfd = open("/dev/ttyACM1", O_RDWR | O_NOCTTY | O_SYNC);
+        serialfd = open("/dev/ttyACM1", O_WRONLY | O_NOCTTY);
         if (serialfd == -1) {
             fprintf(stderr, "ERROR: %s\n", strerror(errno));
             return 1;
         }
     }
+
+    // set options
+    struct termios options;
+    tcgetattr(serialfd, &options);
+    options.c_cflag = B115200 | CS8 | CLOCAL | CREAD;
+    options.c_iflag = IGNPAR;
+    options.c_oflag = 0;
+    options.c_lflag = 0;
+    tcflush(serialfd, TCIFLUSH);
+    tcsetattr(serialfd, TCSANOW, &options);
+
     ServerFlaschenTaschen *display =
         new SerialFlaschenTaschen(serialfd, width, height);
 #endif
